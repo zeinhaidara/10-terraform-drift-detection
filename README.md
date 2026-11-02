@@ -36,6 +36,11 @@ unset to skip the Slack step entirely — drift is still reported in the job sum
 Tested with shellcheck and a local terraform_data test only. Real cloud drift and the Slack post
 are not yet tested.
 
+## State
+
+`config/terraform.tfstate` is committed so a clean checkout plans as "no drift" right away. This
+is a demo shortcut only — real projects use a remote backend and never commit state.
+
 ## Limits
 
 The sample config only simulates drift, by changing the config against saved state. Real cloud
