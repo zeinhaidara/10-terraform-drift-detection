@@ -1,0 +1,6 @@
+.instruction/
+.terraform/
+*.tfstate
+!config/terraform.tfstate
+*.tfstate.backup
+tfplan
