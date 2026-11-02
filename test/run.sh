@@ -6,6 +6,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DRIFT_SH="$ROOT_DIR/scripts/drift.sh"
 FAILED=0
 
+echo "terraform: $(which terraform) ($(terraform version | head -1))"
+
 run_case() {
   local name="$1"
   local expect="$2"
