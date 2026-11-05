@@ -18,6 +18,9 @@ flowchart LR
     C -->|exit 1| F[error]
 ```
 
+On drift, the create/update/delete/replace counts come from `terraform show -json` on the plan,
+not from parsing plan text.
+
 ## Exit codes
 
 | code | meaning |
@@ -33,8 +36,9 @@ unset to skip the Slack step entirely — drift is still reported in the job sum
 
 ## Status
 
-Tested with shellcheck and a local terraform_data test only. Real cloud drift and the Slack post
-are not yet tested.
+Tested with shellcheck and local terraform_data tests, including a forced replacement. Real cloud
+drift and an actual Slack post are not yet tested. A failed Slack post only logs a warning - it
+never changes the script's exit code.
 
 ## State
 
