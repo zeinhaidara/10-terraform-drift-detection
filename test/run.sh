@@ -67,6 +67,26 @@ else
   FAILED=1
 fi
 
-rm -rf "$WORK1" "$WORK2" "$WORK3" "$WORK4" "$SLACK_FILE"
+# case 5: bump triggers_replace -> forced replacement, counted on its own
+WORK5=$(mktemp -d)
+cp "$ROOT_DIR/config/main.tf" "$ROOT_DIR/config/terraform.tfstate" "$WORK5/"
+sed -i 's/revision = 1/revision = 2/' "$WORK5/main.tf"
+set +e
+REPLACE_OUTPUT=$(bash "$DRIFT_SH" "$WORK5" 2>&1)
+REPLACE_EXIT=$?
+set -e
+if [ "$REPLACE_EXIT" -eq 2 ] && echo "$REPLACE_OUTPUT" | grep -q "1 to replace"; then
+  echo "PASS: replacement -> drift with 1 replace"
+else
+  echo "FAIL: replacement -> drift with 1 replace (exit $REPLACE_EXIT)"
+  echo "$REPLACE_OUTPUT"
+  FAILED=1
+fi
+
+# An output-only change isn't possible to test here: terraform_data's output is always a direct
+# copy of its input (see config/main.tf), so there is no way to change output without also
+# changing input - skipping rather than faking a case that can't occur with this resource type.
+
+rm -rf "$WORK1" "$WORK2" "$WORK3" "$WORK4" "$WORK5" "$SLACK_FILE"
 
 exit $FAILED
