@@ -4,7 +4,12 @@ terraform {
 
 # terraform_data has no real backend; it just stores whatever input we give it.
 # That lets the plan diff behave like real drift without touching any cloud account.
+# triggers_replace forces a replace (not an in-place update) whenever it changes, which is what
+# the replacement-counting test case bumps.
 resource "terraform_data" "app_config" {
+  triggers_replace = {
+    revision = 1
+  }
   input = {
     environment = "staging"
     replicas    = 2
