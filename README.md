@@ -1,4 +1,4 @@
-# Terraform drift detection
+# Scheduled Terraform drift detection
 
 Infrastructure sometimes changes outside of Terraform — a manual console edit, a hotfix applied
 by hand, an expired resource recreated differently. Terraform's own state only catches this the
@@ -45,7 +45,7 @@ never changes the script's exit code.
 `config/terraform.tfstate` is committed so a clean checkout plans as "no drift" right away. This
 is a demo shortcut only — real projects use a remote backend and never commit state.
 
-## Limits
+## Known limitations
 
 The sample config only simulates drift, by changing the config against saved state. Real cloud
 drift needs credentials and a real backend, which this repo does not use. The Slack post is not

@@ -4,3 +4,7 @@
 !config/terraform.tfstate
 *.tfstate.backup
 tfplan
+*.tfplan
+__pycache__/
+*.pyc
+memory/
