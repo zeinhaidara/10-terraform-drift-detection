@@ -58,6 +58,13 @@ terraform -chdir=config apply -auto-approve
 bash scripts/drift.sh config   # exit 0, no drift
 ```
 
+Run the same checks as CI (needs Terraform, jq and shellcheck; no cloud account):
+
+```sh
+shellcheck scripts/drift.sh test/run.sh
+bash test/run.sh
+```
+
 Real use needs a remote backend (for example S3 with locking) that holds the state, and the
 "create demo state" step in `.github/workflows/drift.yml` should be removed.
 
