@@ -42,8 +42,24 @@ never changes the script's exit code.
 
 ## State
 
-`config/terraform.tfstate` is committed so a clean checkout plans as "no drift" right away. This
-is a demo shortcut only — real projects use a remote backend and never commit state.
+No state file is committed. The sample config only uses `terraform_data`, so state can be created
+locally in seconds without any cloud account:
+
+- `test/run.sh` copies `config/main.tf` into a temp dir for each case and runs `terraform apply`
+  there first, then edits the config to simulate drift.
+- The scheduled workflow runs `terraform apply` on `config/` before the drift check, so a clean
+  run reports "no drift".
+
+To try it locally:
+
+```sh
+terraform -chdir=config init
+terraform -chdir=config apply -auto-approve
+bash scripts/drift.sh config   # exit 0, no drift
+```
+
+Real use needs a remote backend (for example S3 with locking) that holds the state, and the
+"create demo state" step in `.github/workflows/drift.yml` should be removed.
 
 ## Known limitations
 
