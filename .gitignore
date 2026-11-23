@@ -1,8 +1,7 @@
 .instruction/
 .terraform/
 *.tfstate
-!config/terraform.tfstate
-*.tfstate.backup
+*.tfstate.*
 tfplan
 *.tfplan
 __pycache__/

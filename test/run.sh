@@ -27,14 +27,21 @@ run_case() {
   fi
 }
 
-# case 1: unchanged config against the committed state -> no drift
+# Copies config/main.tf into a dir and applies it there, so the dir has its own fresh state.
+seed_state() {
+  cp "$ROOT_DIR/config/main.tf" "$1/"
+  terraform -chdir="$1" init -input=false >/dev/null
+  terraform -chdir="$1" apply -auto-approve -input=false >/dev/null
+}
+
+# case 1: unchanged config against freshly applied state -> no drift
 WORK1=$(mktemp -d)
-cp "$ROOT_DIR/config/main.tf" "$ROOT_DIR/config/terraform.tfstate" "$WORK1/"
+seed_state "$WORK1"
 run_case "unchanged config -> no drift" 0 bash "$DRIFT_SH" "$WORK1"
 
-# case 2: change the config against the committed state -> drift
+# case 2: change the config against freshly applied state -> drift
 WORK2=$(mktemp -d)
-cp "$ROOT_DIR/config/main.tf" "$ROOT_DIR/config/terraform.tfstate" "$WORK2/"
+seed_state "$WORK2"
 sed -i 's/replicas    = 2/replicas    = 5/' "$WORK2/main.tf"
 set +e
 DRIFT_OUTPUT=$(bash "$DRIFT_SH" "$WORK2" 2>&1)
@@ -55,7 +62,7 @@ run_case "invalid config -> error" 1 bash "$DRIFT_SH" "$WORK3"
 
 # case 4: Slack body written to a file when drift is found
 WORK4=$(mktemp -d)
-cp "$ROOT_DIR/config/main.tf" "$ROOT_DIR/config/terraform.tfstate" "$WORK4/"
+seed_state "$WORK4"
 sed -i 's/replicas    = 2/replicas    = 9/' "$WORK4/main.tf"
 SLACK_FILE=$(mktemp)
 SLACK_WEBHOOK_URL="file://$SLACK_FILE" DRY_SLACK_FILE="$SLACK_FILE" bash "$DRIFT_SH" "$WORK4" >/dev/null 2>&1 || true
@@ -69,7 +76,7 @@ fi
 
 # case 5: bump triggers_replace -> forced replacement, counted on its own
 WORK5=$(mktemp -d)
-cp "$ROOT_DIR/config/main.tf" "$ROOT_DIR/config/terraform.tfstate" "$WORK5/"
+seed_state "$WORK5"
 sed -i 's/revision = 1/revision = 2/' "$WORK5/main.tf"
 set +e
 REPLACE_OUTPUT=$(bash "$DRIFT_SH" "$WORK5" 2>&1)

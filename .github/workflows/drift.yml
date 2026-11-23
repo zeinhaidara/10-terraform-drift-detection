@@ -18,6 +18,12 @@ jobs:
         with:
           terraform_version: 1.9.8
           terraform_wrapper: false
+      # Demo only: no state is committed, so apply the sample config first to create one.
+      # A real setup reads state from a remote backend and drops this step.
+      - name: create demo state
+        run: |
+          terraform -chdir=config init -input=false
+          terraform -chdir=config apply -auto-approve -input=false
       - name: run drift check
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
